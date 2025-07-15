@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Códigos de Productos con SQLite</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧸 Generador de Códigos de Productos</h1>
+            <p>Sistema completo con base de datos SQLite integrada</p>
+            <div class="db-status">
+                <div class="status-indicator"></div>
+                <span id="dbStatusText">Conectando a base de datos...</span>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" data-tab="generator" onclick="switchTab('generator')">📝 Generador</button>
+                <button class="tab" data-tab="products" onclick="switchTab('products')">📋 Productos</button>
+                <button class="tab" data-tab="reports" onclick="switchTab('reports')">📊 Reportes</button>
+                <button class="tab" data-tab="config" onclick="switchTab('config')">⚙️ Configuración</button>
+                <button class="tab" data-tab="database" onclick="switchTab('database')">🗄️ Base de Datos</button>
+            </div>
+
+            <!-- TAB GENERADOR -->
+            <div id="generator" class="tab-content active">
+                <div class="generator-section">
+                    <h3>✨ Generar Nuevo Producto</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="tipo">Tipo de Producto:</label>
+                            <select id="tipo" onchange="updateSubcategories()">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="categoria">Categoría:</label>
+                            <select id="categoria" onchange="updateSubcategories()">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="subcategoria">Subcategoría:</label>
+                            <select id="subcategoria">
+                                <option value="">Seleccionar categoría primero...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="talla">Talla:</label>
+                            <select id="talla">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="color">Color:</label>
+                            <select id="color">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="temporada">Temporada:</label>
+                            <select id="temporada">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button class="btn btn-primary" onclick="generateCode()">🎯 Generar Código</button>
+                    </div>
+                </div>
+
+                <div class="result-section" id="resultSection" style="display: none;">
+                    <h3>📊 Código y Nombre Generados</h3>
+                    <div class="code-display" id="generatedCode">-</div>
+                    <div class="name-display" id="generatedName">-</div>
+                    <div style="margin-top: 20px;">
+                        <button class="btn btn-success" onclick="saveProduct()">💾 Guardar Producto</button>
+                        <button class="btn btn-primary" onclick="generateNewCode()">🔄 Generar Nuevo</button>
+                    </div>
+                </div>
+
+                <div id="alertContainer"></div>
+            </div>
+
+            <!-- TAB PRODUCTOS -->
+            <div id="products" class="tab-content">
+                <div class="search-section">
+                    <h4>🔍 Buscar Productos</h4>
+                    <div class="search-form">
+                        <input type="text" id="searchInput" placeholder="Buscar por código, nombre, categoría...">
+                        <button class="btn btn-primary" onclick="searchProducts()">Buscar</button>
+                        <button class="btn btn-warning" onclick="clearSearch()">Limpiar</button>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3>📋 Productos Registrados</h3>
+                    <div>
+                        <button class="btn btn-primary" onclick="exportToCSV()">📤 Exportar CSV</button>
+                        <button class="btn btn-warning" onclick="exportToJSON()">📤 Exportar JSON</button>
+                    </div>
+                </div>
+                <div id="productsContainer">
+                    <p>Cargando productos...</p>
+                </div>
+            </div>
+
+            <!-- TAB REPORTES -->
+            <div id="reports" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalProducts">0</div>
+                        <div class="stat-label">Total Productos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalCategories">0</div>
+                        <div class="stat-label">Categorías</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalColors">0</div>
+                        <div class="stat-label">Colores Únicos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="lastCode">-</div>
+                        <div class="stat-label">Último Código</div>
+                    </div>
+                </div>
+                
+                <div class="config-section">
+                    <h3>📈 Reportes Detallados</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="generateCategoryReport()">Reporte por Categorías</button>
+                        <button class="btn btn-primary" onclick="generateColorReport()">Reporte por Colores</button>
+                        <button class="btn btn-primary" onclick="generateSizeReport()">Reporte por Tallas</button>
+                        <button class="btn btn-primary" onclick="generateSeasonReport()">Reporte por Temporadas</button>
+                    </div>
+                </div>
+                
+                <div id="reportResults"></div>
+            </div>
+
+            <!-- TAB CONFIGURACIÓN -->
+            <div id="config" class="tab-content">
+                <div class="config-section">
+                    <h3>⚙️ Configuración del Sistema</h3>
+                    <div class="config-grid">
+                        <!-- TIPOS DE PRODUCTO -->
+                        <div class="config-item">
+                            <h4>📦 Tipos de Producto</h4>
+                            <div class="config-list" id="tiposConfig"></div>
+                            <div class="add-form">
+                                <h5>➕ Agregar Nuevo Tipo</h5>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTipoCode" placeholder="Código (ej: 6)" maxlength="1">
+                                </div>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTipoName" placeholder="Nombre del tipo">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addConfigItem('tipos')">✅ Agregar Tipo</button>
+                            </div>
+                        </div>
+
+                        <!-- CATEGORÍAS -->
+                        <div class="config-item">
+                            <h4>📂 Categorías</h4>
+                            <div class="config-list" id="categoriasConfig"></div>
+                            <div class="add-form">
+                                <h5>➕ Agregar Nueva Categoría</h5>
+                                <div class="add-form-row">
+                                    <input type="text" id="newCategoriaCode" placeholder="Código (ej: 99)" maxlength="2">
+                                </div>
+                                <div class="add-form-row">
+                                    <input type="text" id="newCategoriaName" placeholder="Nombre de la categoría">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addConfigItem('categorias')">✅ Agregar Categoría</button>
+                            </div>
+                        </div>
+
+                        <!-- TALLAS -->
+                        <div class="config-item">
+                            <h4>📏 Tallas</h4>
+                            <div class="config-list" id="tallasConfig"></div>
+                            <div class="add-form">
+                                <h5>➕ Agregar Nueva Talla</h5>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTallaCode" placeholder="Código (ej: 8)" maxlength="1">
+                                </div>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTallaName" placeholder="Descripción de la talla">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addConfigItem('tallas')">✅ Agregar Talla</button>
+                            </div>
+                        </div>
+
+                        <!-- COLORES -->
+                        <div class="config-item">
+                            <h4>🎨 Colores</h4>
+                            <div class="config-list" id="coloresConfig"></div>
+                            <div class="add-form">
+                                <h5>➕ Agregar Nuevo Color</h5>
+                                <div class="add-form-row">
+                                    <input type="text" id="newColorCode" placeholder="Código (ej: 16)" maxlength="2">
+                                </div>
+                                <div class="add-form-row">
+                                    <input type="text" id="newColorName" placeholder="Nombre del color">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addConfigItem('colores')">✅ Agregar Color</button>
+                            </div>
+                        </div>
+
+                        <!-- TEMPORADAS -->
+                        <div class="config-item">
+                            <h4>🗓️ Temporadas</h4>
+                            <div class="config-list" id="temporadasConfig"></div>
+                            <div class="add-form">
+                                <h5>➕ Agregar Nueva Temporada</h5>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTemporadaCode" placeholder="Código (ej: 0)" maxlength="1">
+                                </div>
+                                <div class="add-form-row">
+                                    <input type="text" id="newTemporadaName" placeholder="Nombre de la temporada">
+                                </div>
+                                <button class="btn btn-success btn-small" onclick="addConfigItem('temporadas')">✅ Agregar Temporada</button>
+                            </div>
+                        </div>
+
+                        <!-- SUBCATEGORÍAS -->
+                        <div class="config-item">
+                            <h4>📋 Gestión de Subcategorías</h4>
+                            <div class="form-group">
+                                <label for="subcatCategorySelect">Seleccionar Categoría:</label>
+                                <select id="subcatCategorySelect" onchange="loadSubcategoriesForCategory()">
+                                    <option value="">Seleccionar categoría...</option>
+                                </select>
+                            </div>
+                            <div id="subcategoryManagement" style="display: none;">
+                                <div class="subcategory-section">
+                                    <h5>Subcategorías Existentes</h5>
+                                    <div id="subcategoriesList"></div>
+                                </div>
+                                <div class="add-form">
+                                    <h5>➕ Agregar Nueva Subcategoría</h5>
+                                    <div class="add-form-row">
+                                        <input type="text" id="newSubcategoriaCode" placeholder="Código (ej: 7)" maxlength="1">
+                                    </div>
+                                    <div class="add-form-row">
+                                        <input type="text" id="newSubcategoriaName" placeholder="Nombre de la subcategoría">
+                                    </div>
+                                    <button class="btn btn-success btn-small" onclick="addSubcategory()">✅ Agregar Subcategoría</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB BASE DE DATOS -->
+            <div id="database" class="tab-content">
+                <div class="db-actions">
+                    <h4>🗄️ Gestión de Base de Datos</h4>
+                    <div class="action-buttons">
+                        <button class="btn btn-success" onclick="backupDatabase()">💾 Crear Respaldo</button>
+                        <button class="btn btn-warning" onclick="document.getElementById('restoreFile').click()">📂 Restaurar Respaldo</button>
+                        <button class="btn btn-danger" onclick="clearAllData()">🗑️ Limpiar Todo</button>
+                        <button class="btn btn-primary" onclick="loadSampleData()">📋 Cargar Datos de Prueba</button>
+                    </div>
+                    <input type="file" id="restoreFile" style="display: none;" accept=".db,.sqlite,.json" onchange="restoreDatabase(event)">
+                </div>
+
+                <div class="config-section">
+                    <h4>📊 Información de la Base de Datos</h4>
+                    <div id="dbInfo">
+                        <p>Cargando información...</p>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h4>🔧 Consultas SQL Directas</h4>
+                    <div style="margin-bottom: 15px;">
+                        <textarea id="sqlQuery" rows="4" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px;" placeholder="SELECT * FROM productos LIMIT 10;"></textarea>
+                    </div>
+                    <div>
+                        <button class="btn btn-primary" onclick="executeSQLQuery()">▶️ Ejecutar Consulta</button>
+                        <button class="btn btn-warning" onclick="clearSQLResult()">🧹 Limpiar Resultado</button>
+                    </div>
+                    <div id="sqlResult" style="margin-top: 20px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA EDITAR PRODUCTOS -->
+    <div id="editModal" class="modal">
+        <div class="modal-content edit-modal">
+            <div class="modal-header">
+                <h2 class="modal-title">✏️ Editar Producto</h2>
+                <span class="close" onclick="closeEditModal()">&times;</span>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="editTipo">Tipo de Producto:</label>
+                    <select id="editTipo" onchange="updateEditSubcategories()">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editCategoria">Categoría:</label>
+                    <select id="editCategoria" onchange="updateEditSubcategories()">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editSubcategoria">Subcategoría:</label>
+                    <select id="editSubcategoria">
+                        <option value="">Seleccionar categoría primero...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editTalla">Talla:</label>
+                    <select id="editTalla">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editColor">Color:</label>
+                    <select id="editColor">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editTemporada">Temporada:</label>
+                    <select id="editTemporada">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editNombre">Nombre del Producto:</label>
+                    <input type="text" id="editNombre" placeholder="Nombre será generado automáticamente">
+                </div>
+            </div>
+            <div class="edit-actions">
+                <button class="btn btn-success" onclick="updateProduct()">💾 Guardar Cambios</button>
+                <button class="btn btn-warning" onclick="closeEditModal()">❌ Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PARA CONFIRMACIÓN DE PRODUCTO DUPLICADO -->
+    <div id="duplicateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">⚠️ Producto Similar Encontrado</h2>
+                <span class="close" onclick="closeDuplicateModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <strong>Ya existe un producto registrado con estas características:</strong>
+                </div>
+                <div id="duplicateProductInfo" style="margin: 20px 0;"></div>
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
+                    <strong>Nuevo producto que desea crear:</strong>
+                    <div id="newProductInfo" style="margin-top: 10px;"></div>
+                </div>
+                <p><strong>¿Desea continuar y guardar este producto de todas formas?</strong></p>
+            </div>
+            <div class="edit-actions">
+                <button class="btn btn-success" onclick="confirmSaveProduct()">✅ Sí, Guardar de todas formas</button>
+                <button class="btn btn-danger" onclick="closeDuplicateModal()">❌ No, Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cargar SQLite WASM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-wasm.js"></script>
+    
+    <!-- Cargar scripts de la aplicación -->
+    <script src="database.js"></script>
+    <script src="config.js"></script>
+    <script src="products.js"></script>
+    <script src="reports.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
