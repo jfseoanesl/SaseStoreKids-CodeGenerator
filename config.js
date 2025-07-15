@@ -316,8 +316,8 @@ function validateConfigInput(type, codigo, nombre) {
             }
             break;
         case 'tallas':
-            if (codigo.length !== 1 || isNaN(codigo)) {
-                showAlert('El código de talla debe ser un solo dígito', 'danger');
+            if (codigo.length !== 2 || isNaN(codigo)) {
+                showAlert('El código de talla debe ser de 2 dígitos', 'danger');
                 return false;
             }
             break;

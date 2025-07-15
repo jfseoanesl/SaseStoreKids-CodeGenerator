@@ -34,14 +34,14 @@ const initialConfigData = {
         '90': { '1': 'Vestidos de fiesta', '2': 'Trajes elegantes', '3': 'Disfraces', '4': 'Ropa ceremonial' }
     },
     tallas: {
-        '0': 'Talla única',
-        '1': '2-4 años',
-        '2': '4-6 años',
-        '3': '6-8 años',
-        '4': '8-10 años',
-        '5': '10-12 años',
-        '6': '12-14 años',
-        '7': '14-16 años'
+        '00': 'Talla única',
+        '01': '2-4 años',
+        '02': '4-6 años',
+        '03': '6-8 años',
+        '04': '8-10 años',
+        '05': '10-12 años',
+        '06': '12-14 años',
+        '07': '14-16 años'
     },
     colores: {
         '01': 'Blanco', '02': 'Negro', '03': 'Rosa', '04': 'Azul', '05': 'Rojo',
@@ -538,14 +538,14 @@ function loadSampleData() {
             }
 
             const sampleProducts = [
-                { tipo: '1', categoria: '10', subcategoria: '1', talla: '2', color: '03', temporada: '4' },
-                { tipo: '1', categoria: '20', subcategoria: '2', talla: '3', color: '04', temporada: '1' },
-                { tipo: '3', categoria: '30', subcategoria: '1', talla: '4', color: '05', temporada: '2' },
-                { tipo: '1', categoria: '50', subcategoria: '2', talla: '2', color: '02', temporada: '6' },
-                { tipo: '2', categoria: '60', subcategoria: '1', talla: '0', color: '03', temporada: '4' },
-                { tipo: '1', categoria: '40', subcategoria: '2', talla: '3', color: '11', temporada: '4' },
-                { tipo: '3', categoria: '90', subcategoria: '1', talla: '5', color: '15', temporada: '5' },
-                { tipo: '1', categoria: '70', subcategoria: '1', talla: '0', color: '07', temporada: '6' }
+                { tipo: '1', categoria: '10', subcategoria: '1', talla: '02', color: '03', temporada: '4' },
+                { tipo: '1', categoria: '20', subcategoria: '2', talla: '03', color: '04', temporada: '1' },
+                { tipo: '3', categoria: '30', subcategoria: '1', talla: '04', color: '05', temporada: '2' },
+                { tipo: '1', categoria: '50', subcategoria: '2', talla: '02', color: '02', temporada: '6' },
+                { tipo: '2', categoria: '60', subcategoria: '1', talla: '00', color: '03', temporada: '4' },
+                { tipo: '1', categoria: '40', subcategoria: '2', talla: '03', color: '11', temporada: '4' },
+                { tipo: '3', categoria: '90', subcategoria: '1', talla: '05', color: '15', temporada: '5' },
+                { tipo: '1', categoria: '70', subcategoria: '1', talla: '02', color: '07', temporada: '6' }
             ];
 
             sampleProducts.forEach(producto => {
